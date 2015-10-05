@@ -1,39 +1,49 @@
-require_relative 'pieces.rb'
+require_relative 'pieces'
 
 class Board
   attr_reader :grid
+    ROW_PIECES= [Rook, Knight, Bishop, Queen, King, Bishop, Knight, Rook]
+    PAWNS= [Pawn, Pawn, Pawn, Pawn, Pawn, Pawn, Pawn, Pawn]
 
   def initialize
     @grid = Array.new(8) { Array.new(8) }
 
-    row_pieces = [Rook, Knight, Bishop, Queen, King, Bishop, Knight, Rook]
 
     # PIECES = [Rook, Knight, Bishop...]
     #
     # PIECES.map { |piece| piece.new }
+  end
 
+  def populate_board
     @grid.map!.with_index do |row, idx|
 
-        if idx == 1
-          pawns = []
-          8.times { pawns << Pawn.new(:white) }
-          pawns
-        elsif idx == 6
-          pawns = []
-          8.times { pawns << Pawn.new(:black) }  
-          pawns
-        elsif idx == 0
-          row_pieces.map do |piece|
-            piece.new(:white)
-          end
-        elsif idx == 7
-          row_pieces.map do |piece|
-            piece.new(:black)
-          end
+      if idx == 1
+        PAWNS.map.with_index do |piece, i|
+          piece.new([idx, i], self, :black)
         end
-
+      elsif idx == 6
+        PAWNS.map.with_index do |piece, i|
+          piece.new([idx, i], self, :red)
+        end
+      elsif idx == 0
+        i = 0
+        ROW_PIECES.map.with_index do |piece, i|
+          piece.new([idx, i], self, :black)
+        end
+      elsif idx == 7
+        i=0
+        ROW_PIECES.map.with_index do |piece, i|
+          piece.new([idx, i], self, :red)
+        end
+      else
+        nulls = []
+        8.times { nulls << NullPiece.new([@grid.index(row), idx], self, :red) }
+        nulls
+      end
     end
   end
+
+
 
   def move(start, end_pos)
     active_piece = @grid[start]
@@ -47,6 +57,10 @@ class Board
     end
   end
 
+  def in_bounds?(pos)
+    pos.all? { |x| x.between?(0, 7) }
+  end
+
   def [](pos)
     x, y = pos
     @grid[x][y]
@@ -57,9 +71,14 @@ class Board
     @grid[x][y] = value
   end
 
+  def rows
+    @grid
+  end
 
 end
 
 
-c = Board.new.grid
-puts c
+
+a = Board.new
+b = SlidingPiece.new([0,0], a, :black)
+b.moves
