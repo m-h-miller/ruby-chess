@@ -46,15 +46,11 @@ class Board
   end
 
   def move(start, end_pos)
-    active_piece = @grid[start]
-    if @grid[start].nil?
-      raise MoveError.new 'No piece there'
-    elsif !active_piece.valid_moves(start).include?(end_pos)
-      raise MoveError.new 'Piece can\'t move there'
-    else
-      @grid[end_pos] = active_piece
-      @grid[start] = nil
-    end
+    piece = self[start]
+    # raise "Invalid move!!!" unless piece.valid_moves.include? end_pos
+
+    self[end_pos] = piece.class.new(end_pos, self, piece.color)
+    self[start] = NullPiece.new(start, self, :green)
   end
 
   def in_bounds?(pos)
