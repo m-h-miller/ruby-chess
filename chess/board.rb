@@ -9,46 +9,39 @@ class Board
     @grid = Array.new(8) { Array.new(8) }
   end
 
-
   def self.within_board?(pos)
     return true if pos.all? { |x| x.between?(0, 7) }
     false
   end
-
-
-
-
 
   def populate_board
     @grid.map!.with_index do |row, idx|
 
       if idx == 1
         PAWNS.map.with_index do |piece, i|
-          piece.new([i, idx], self, :black)
+          piece.new([i, idx], self, :red)
         end
       elsif idx == 6
         PAWNS.map.with_index do |piece, i|
-          piece.new([i, idx], self, :red)
+          piece.new([i, idx], self, :black)
         end
       elsif idx == 0
         i = 0
         ROW_PIECES.map.with_index do |piece, i|
-          piece.new([i, idx], self, :black)
+          piece.new([i, idx], self, :red)
         end
       elsif idx == 7
         i=0
         ROW_PIECES.map.with_index do |piece, i|
-          piece.new([i, idx], self, :red)
+          piece.new([i, idx], self, :black)
         end
       else
         nulls = []
-        8.times { |i| nulls << NullPiece.new([i, idx], self, :red) }
+        8.times { |i| nulls << NullPiece.new([i, idx], self, :green) }
         nulls
       end
     end
   end
-
-
 
   def move(start, end_pos)
     active_piece = @grid[start]

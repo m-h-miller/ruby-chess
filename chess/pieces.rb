@@ -1,4 +1,6 @@
 require 'byebug'
+require_relative 'sliding_piece.rb'
+require_relative 'stepping_piece.rb'
 
 class Piece
 
@@ -17,47 +19,70 @@ class Piece
 end
 
 class Pawn < Piece
+  # MOVES_BLACK = [ [0,-1], [0,-2] ]
+  # MOVES_RED = [ [0,1], [0,2] ]
+  CAPTURE_BLACK = [[1,-1], [-1,-1] ]
+  CAPTURE_RED = [ [1,1], [-1,1] ]
 
   def to_s
     " P ".colorize(color)
   end
-end
 
-module PerpSlidingPiece
-  PERP_MOVES = [ [0,1], [1,0], [0, -1], [-1, 0] ]
+  def at_start?
+    if self.color == :black
+      return true if self.position[1] == 6
+    elsif self.color == :red
+      return true if self.position[1] == 1
+    end
+    false
+  end
 
-  def generate_moves
+  def capturable_pos #return positions
+    x, y = self.position
     moves = []
-    # debugger
-    PERP_MOVES.each do |diff_x, diff_y|
-      current_pos = self.position
-
-      while Board.within_board?(current_pos)
-        new_pos = [current_pos[0] + diff_x, current_pos[1] + diff_y]
-        break unless Board.within_board?(new_pos)
-        break unless @board[new_pos].empty?
-        moves << new_pos
-        current_pos = new_pos
-
+    if self.color == :black
+      CAPTURE_BLACK.each do |x_diff, y_diff|
+        new_pos = [x + x_diff, y + y_diff]
+        next if !Board.within_board?(new_pos)
+        moves << new_pos if @board[new_pos].color == :red
+      end
+    elsif self.color == :red
+      CAPTURE_RED.each do |x_diff, y_diff|
+        new_pos = [x + x_diff, y + y_diff]
+        next if !Board.within_board?(new_pos)
+        moves << new_pos if @board[new_pos].color == :black
       end
     end
     moves
   end
 
+
+  def generate_moves
+    moves = []
+    x, y = self.position
+    if self.color == :black
+      new_pos = [x, y-1]
+      moves << new_pos if @board[new_pos].empty? && Board.within_board?(new_pos)
+
+      moves << [x, y-2] if at_start?
+
+      moves << capturable_pos unless capturable_pos.empty?
+    elsif self.color == :red
+      new_pos = [x, y+1]
+      moves << new_pos if @board[new_pos].empty? && Board.within_board?(new_pos)
+
+      moves << [x, y+2] if at_start?
+
+      moves << capturable_pos unless capturable_pos.empty?
+    end
+    moves
+  end
 end
 
-
-module DiagSlidingPiece
-  DIAG_MOVES = [ [1,1], [-1,1], [1,-1], [-1,-1] ]
-  valid_moves = []
-end
-
-class SteppingPiece < Piece
-end
 
 class Rook < Piece
-  include PerpSlidingPiece
-
+  include SlidingPiece
+  MOVES = [ [0,1], [1,0], [0, -1], [-1, 0] ]
   def to_s
     " R ".colorize(color)
   end
@@ -65,24 +90,32 @@ class Rook < Piece
 end
 
 class Bishop < Piece
+  include SlidingPiece
+  MOVES = [ [1,1], [-1,1], [1,-1], [-1,-1] ]
   def to_s
     " B ".colorize(color)
   end
 end
 
 class Queen < Piece
+  include SlidingPiece
+  MOVES = [ [1,1], [-1,1], [1,-1], [-1,-1] ] + [ [0,1], [1,0], [0, -1], [-1, 0] ]
   def to_s
     " Q ".colorize(color)
   end
 end
 
 class King < Piece
+  include SteppingPiece
+  MOVES = [ [1,1], [-1,1], [1,-1], [-1,-1], [0,1], [1,0], [0, -1], [-1, 0] ]
   def to_s
     " K ".colorize(color)
   end
 end
 
 class Knight < Piece
+  include SteppingPiece
+  MOVES = [ [1, 2], [1, -2], [-1, 2], [-1, -2], [2, 1], [2, -1], [-2, 1], [-2, -1] ]
   def to_s
     " N ".colorize(color)
   end
