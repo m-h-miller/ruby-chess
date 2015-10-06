@@ -7,12 +7,17 @@ class Board
 
   def initialize
     @grid = Array.new(8) { Array.new(8) }
-
-
-    # PIECES = [Rook, Knight, Bishop...]
-    #
-    # PIECES.map { |piece| piece.new }
   end
+
+
+  def self.within_board?(pos)
+    return true if pos.all? { |x| x.between?(0, 7) }
+    false
+  end
+
+
+
+
 
   def populate_board
     @grid.map!.with_index do |row, idx|
@@ -76,9 +81,3 @@ class Board
   end
 
 end
-
-
-
-a = Board.new
-b = SlidingPiece.new([0,0], a, :black)
-b.moves

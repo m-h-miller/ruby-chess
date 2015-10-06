@@ -10,10 +10,8 @@ class Piece
     @board = board
   end
 
-
-  def within_board?
-    return false if self.position.all? { |x| x.between?(0, 7) }
-    true
+  def empty?
+    false
   end
 
 end
@@ -25,71 +23,65 @@ class Pawn < Piece
   end
 end
 
-class SlidingPiece < Piece
+module PerpSlidingPiece
+  PERP_MOVES = [ [0,1], [1,0], [0, -1], [-1, 0] ]
 
-
-
-  def moves
-    array = Array.new(8) {Array.new(8)}
-    array.map!.with_index do |_, x|
-      array.map!.with_index do |_, y|
-        [x,y]
-      end
-    end
+  def generate_moves
     moves = []
+    debugger
+    PERP_MOVES.each do |diff_x, diff_y|
+      current_pos = self.position
 
-    array.each do |row|
-      p row
-      row.each do |tile|
-        p tile
-        tile.last == position.last || tile.first == position.first
-        moves << tile
+      while Board.within_board?(current_pos)
+        new_pos = [current_pos[0] + diff_x, current_pos[1] + diff_y]
+        break unless ( Board.within_board?(new_pos) && @board[new_pos].empty? )
+        moves << new_pos
+        current_pos = new_pos
+
       end
     end
     moves
   end
 
+end
 
 
-
-  def move_dirs
-
-
-
-  end
-
-
-
+module DiagSlidingPiece
+  DIAG_MOVES = [ [1,1], [-1,1], [1,-1], [-1,-1] ]
+  valid_moves = []
 end
 
 class SteppingPiece < Piece
 end
 
-class Rook < SlidingPiece
+class Rook < Piece
+  include PerpSlidingPiece
+
   def to_s
     " R ".colorize(color)
   end
+
 end
 
-class Bishop < SlidingPiece
+class Bishop < Piece
   def to_s
     " B ".colorize(color)
   end
 end
 
-class Queen < SlidingPiece
+class Queen < Piece
   def to_s
     " Q ".colorize(color)
   end
 end
 
-class King < SteppingPiece
+class King < Piece
   def to_s
     " K ".colorize(color)
   end
 end
 
-class Knight < SteppingPiece
+class Knight < Piece
   def to_s
     " N ".colorize(color)
   end
@@ -98,5 +90,9 @@ end
 class NullPiece < Piece
   def to_s
     "   "
+  end
+
+  def empty?
+    true
   end
 end
