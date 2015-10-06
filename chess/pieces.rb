@@ -28,13 +28,14 @@ module PerpSlidingPiece
 
   def generate_moves
     moves = []
-    debugger
+    # debugger
     PERP_MOVES.each do |diff_x, diff_y|
       current_pos = self.position
 
       while Board.within_board?(current_pos)
         new_pos = [current_pos[0] + diff_x, current_pos[1] + diff_y]
-        break unless ( Board.within_board?(new_pos) && @board[new_pos].empty? )
+        break unless Board.within_board?(new_pos)
+        break unless @board[new_pos].empty?
         moves << new_pos
         current_pos = new_pos
 

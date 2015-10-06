@@ -24,25 +24,25 @@ class Board
 
       if idx == 1
         PAWNS.map.with_index do |piece, i|
-          piece.new([idx, i], self, :black)
+          piece.new([i, idx], self, :black)
         end
       elsif idx == 6
         PAWNS.map.with_index do |piece, i|
-          piece.new([idx, i], self, :red)
+          piece.new([i, idx], self, :red)
         end
       elsif idx == 0
         i = 0
         ROW_PIECES.map.with_index do |piece, i|
-          piece.new([idx, i], self, :black)
+          piece.new([i, idx], self, :black)
         end
       elsif idx == 7
         i=0
         ROW_PIECES.map.with_index do |piece, i|
-          piece.new([idx, i], self, :red)
+          piece.new([i, idx], self, :red)
         end
       else
         nulls = []
-        8.times { nulls << NullPiece.new([@grid.index(row), idx], self, :red) }
+        8.times { |i| nulls << NullPiece.new([i, idx], self, :red) }
         nulls
       end
     end
@@ -68,7 +68,7 @@ class Board
 
   def [](pos)
     x, y = pos
-    @grid[x][y]
+    @grid[y][x]
   end
 
   def []=(pos, value)
