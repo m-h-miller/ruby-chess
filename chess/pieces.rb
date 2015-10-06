@@ -12,6 +12,18 @@ class Piece
     @board = board
   end
 
+  def valid_moves
+    self.generate_moves.reject { |pos| move_into_check?(pos)}
+  end
+
+  def move_into_check?(pos)
+    dup = @board.deep_dup
+    old_pos = self.position
+    dup[pos] = self.class.new(pos, dup, self.color)
+    dup[old_pos] = NullPiece.new(old_pos, dup, :green)
+    dup.in_check?(self.color)
+  end
+
   def empty?
     false
   end
